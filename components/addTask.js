@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View, TextInput, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import { useState, useEffect } from 'react';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { SafeAreaProvider, useSafeAreaFrame } from 'react-native-safe-area-context';
 import Feather from '@expo/vector-icons/Feather';
+import { useHabbitsStore } from '../store/HomeStore';
 
 export default function AddTask({screen}){
   const [tags, setTags] = useState([
@@ -10,12 +10,34 @@ export default function AddTask({screen}){
     { id: '2', title: 'Study React Native', type: 'todo', completed: false },
     { id: '3', title: 'Drink water', type: 'habit', completed: false },
   ]);
+
+  
+
+  const {addHabbit} = useHabbitsStore((state)=> state.addHabbit)
+
   const [rCBtnPsed, setRCBtnPsed] = useState(false)
-  return(
+  const [title, setTitle] = useState("");
+  const [notes, setNotes] = useState("");
+  const [ctrlPos, setCtrlPos] = useState(false);
+  const [ctrlNeg, setCtrlNeg] = useState(false);
+  const [resetCont, setResetCont] = useState("");
+  const [tags0, setTags0] = useState([]);
+  
+  return( 
     <View style={styles.container}>
 
       <View style ={styles.fixedCont} >
-        <TouchableOpacity >
+        <TouchableOpacity 
+        onPress={()=>addHabbit({
+          id: Math.random().toString(36).substring(2) + Date.now().toString(36),
+          title: title, 
+          notes: notes,
+          ctrlPos: ctrlPos, 
+          ctrlNeg: ctrlNeg,
+          resetCont: resetCont,
+          tags0: tags0
+        })}
+        >
         <Text style={{color:'white', fontSize: 15, padding: 10}}>Cancel</Text>
         </TouchableOpacity>
         <Text style={{textAlign: 'center', color: 'white', fontSize: 18}}> New {screen}  </Text>
@@ -29,13 +51,13 @@ export default function AddTask({screen}){
         <Text style={styles.inputTetxt}>Title</Text>
         <TextInput  
         style={styles.textInput}
-        onChangeText={(e) => console.log(e)} 
+        onChangeText={(e) => setTitle(e)} 
         />
 
         <Text style={styles.inputTetxt}>Notes</Text>
         <TextInput
         style={styles.textInput} 
-        onChangeText={(e) => console.log(e)} 
+        onChangeText={(e) => setNotes(e)} 
         multiline
         />
       </View>
@@ -44,13 +66,13 @@ export default function AddTask({screen}){
         <Text style={styles.subHeading}>CONTROLS</Text>
         <View style={styles.subCont1}>
           <View style={{alignItems: 'center', paddingLeft: 50}}>
-            <TouchableOpacity style={{padding: 5}}>
+            <TouchableOpacity style={{padding: 5}} onPress={()=>setCtrlPos(!ctrlPos)}>
               <Feather name="plus-circle" size={30} color="white" />
             </TouchableOpacity>
             <Text style={styles.inputTetxt}>Positive</Text>
           </View>
           <View style={{alignItems: 'center', paddingRight: 50}}>
-            <TouchableOpacity style={{padding: 5}}>
+            <TouchableOpacity style={{padding: 5}} onPress={()=>setCtrlPos(!ctrlNeg)}>
               <Feather name="minus-circle" size={30} color="white" />
             </TouchableOpacity>
             <Text style={styles.inputTetxt}>Negative</Text>
@@ -62,15 +84,19 @@ export default function AddTask({screen}){
         <Text style={styles.subHeading}>RESET COUNTER</Text>
         <View style={styles.subCont1}>
           
-            <TouchableOpacity style={[styles.rContBtn, {backgroundColor: rCBtnPsed ? 'purple': '#211e29'} ]} onPress={()=>{setRCBtnPsed(!rCBtnPsed)}}>
+            <TouchableOpacity 
+            style={[styles.rContBtn, {backgroundColor: rCBtnPsed ? 'purple': '#211e29'} ]} 
+            onPress={()=>{setRCBtnPsed(!rCBtnPsed), setResetCont('Daily')}}>
               <Text style={{fontSize: 18, color: 'white'}}>Daily</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={[styles.rContBtn, {backgroundColor:  '#211e29' },]} onPress={()=>{setRCBtnPsed(!rCBtnPsed)}}>
+            <TouchableOpacity style={[styles.rContBtn, {backgroundColor:  '#211e29' },]} 
+            onPress={()=>{setRCBtnPsed(!rCBtnPsed), setResetCont('Weekly')}}>
               <Text style={{fontSize: 18, color: 'white'}}>Weekly</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.rContBtn, {backgroundColor:  '#211e29'} ,]} onPress={()=>{setRCBtnPsed(!rCBtnPsed)}}>
+            <TouchableOpacity style={[styles.rContBtn, {backgroundColor:  '#211e29'} ,]} 
+            onPress={()=>{setRCBtnPsed(!rCBtnPsed), setResetCont('Monthly')}}>
               <Text style={{fontSize: 18, color: 'white'}}>Monthly</Text>
             </TouchableOpacity>
             
@@ -86,7 +112,10 @@ export default function AddTask({screen}){
         data={tags}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity style={{borderBottomWidth: 0.5,borderBottomColor: '#a19ea8', marginHorizontal: 10, padding: 2}}>
+          <TouchableOpacity 
+          style={{borderBottomWidth: 0.5,borderBottomColor: '#a19ea8', marginHorizontal: 10, padding: 2}}
+          onPress={()=>setTags0([...setTags0, item.title])}
+          >
           <Text style={{color: 'white', fontSize: 15}}> {item.title} </Text>
           </TouchableOpacity>
         )}

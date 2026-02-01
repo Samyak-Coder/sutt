@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Button, FlatList, TouchableOpacity } from 'reac
 import { useState, useEffect } from 'react';
 import TaskBtn from '../components/taskBtn'
 import {LeftHeader, RightHeader} from '../components/headerBtn'
+import { useHabbitsStore } from '../store/HomeStore';
 
 export default function Home({navigation}) {
   const [tasks, setTasks] = useState([
@@ -11,7 +12,12 @@ export default function Home({navigation}) {
   ]);
   
   const [gold, setGold] = useState(100);
-  const [xp, setXp] = useState(0);
+  const [xp, setXp] = useState(0);  
+
+  const {habbits, rmHabbit} = useHabbitsStore((state)=>({
+      habbits: state.habbits,
+      rmHabbit: state.rmHabbit
+    }))
   
   navigation.setOptions({
     title: 'Habits',
@@ -37,7 +43,7 @@ export default function Home({navigation}) {
       </View>
       
       <FlatList
-        data={tasks}
+        data={habbits}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TaskBtn item={item}/>
